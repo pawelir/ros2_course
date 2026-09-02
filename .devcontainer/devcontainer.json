@@ -1,0 +1,41 @@
+{
+  "name": "ROS 2 Jazzy course",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "ubuntu",
+  "updateRemoteUserUID": true,
+  "workspaceFolder": "/workspaces/ros2_course",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/ros2_course,type=bind",
+  "runArgs": [
+    "--network=host",
+    "--ipc=host",
+    "--env=DISPLAY=${localEnv:DISPLAY}",
+    "--volume=/tmp/.X11-unix:/tmp/.X11-unix"
+  ],
+  "containerEnv": {
+    "TURTLEBOT3_MODEL": "burger",
+    "ROS_DOMAIN_ID": "${localEnv:ROS_DOMAIN_ID:0}",
+    "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+    "QT_X11_NO_MITSHM": "1"
+  },
+  "postCreateCommand": "bash .devcontainer/post_create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-iot.vscode-ros",
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.analysis.extraPaths": [
+          "/opt/ros/jazzy/lib/python3.12/site-packages",
+          "/workspaces/ros2_course/install/lib/python3.12/site-packages"
+        ]
+      }
+    }
+  }
+}

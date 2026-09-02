@@ -1,51 +1,68 @@
-# module 1
+# Module 1: Exploring a running ROS 2 system
 
 ## Theory
 
-- ROS 2 architecture
-- ROS 2 nodes
-- ROS 2 topics
-- ROS 2 messages
-- CLI commands
+- ROS 2 architecture: nodes, DDS, the ROS graph
+- Nodes, topics, messages, quality of service
+- CLI tools: `ros2 node`, `ros2 topic`, `ros2 interface`, `rqt_graph`
+- Workspaces, packages, `colcon`, sourcing
 
 ## Exercise
 
-Goal of this exercise is to familiarize with ROS 2 system by investigating Turtlebot3 Gazebo-based simulation.
+Goal: get comfortable with the CLI by poking at the TurtleBot3 simulation. No code yet.
 
-1. Start simulation
-  
-    The simulation is already integrated with working environment.
+1. **Start the simulation.** Run the VS Code task `simulation` (`Ctrl+Shift+P` -> `Tasks: Run Task` -> `simulation`).
+   Gazebo opens with a TurtleBot3 *burger* in a small arena. On a slow machine use `simulation (headless)` instead.
 
-    All you need to do is to launch it via predefined vscode task:
-  
-   1. Invoke tasks list
+   From a terminal the same thing is:
 
-        ```bash
-        ctrl + shift + t
-        ```
+   ```bash
+   ros2 launch course_bringup sim.launch.py            # add gui:=false for headless
+   ```
 
-   2. Select `simulation` task
+2. **Inspect the graph.** _Slides: 01-basic-concepts (Nodes, Topics, Messages), 04-tools (rqt_graph)_
 
-        ![launch_simulation](../images/exercises/module_1/launch_simulation.png)
+   1. List the running nodes. You should see `/robot_state_publisher` and `/ros_gz_bridge`.
+   2. Show details of `/ros_gz_bridge`: which topics does it publish and subscribe to?
+   3. List all topics with their types (`ros2 topic list -t`).
+   4. What is the message type of `/scan`? Print its definition with `ros2 interface show`.
+      Find the fields `ranges`, `range_min`, `range_max`, `angle_increment`. What do they mean?
+   5. Echo `/scan` once. How many values are in `ranges`? What does `inf` mean there?
+   6. Measure the publish rate of `/scan` and `/odom` (`ros2 topic hz`). Which is faster and why?
+   7. Open `rqt_graph`. Which node produces `/scan`? Where does `/cmd_vel` go?
 
-2. Inspect the created nodes and their topics
+   **Checkpoint:** you can explain, in one sentence each, what `/scan`, `/odom`, `/cmd_vel` and `/tf` carry.
 
-    _Lecture slides (pages xx-xx)_
+3. **Drive the robot from the terminal.** _Slides: 01-basic-concepts (Topics – CLI, Messages)_
 
-   1. List active nodes
-   2. Check details of the `/turtlebot3_laserscan` node
-   3. List available topics
-   4. Check type of LIDAR's topic (`/scan`)
-   5. Listen to topic (`/scan`)
-   6. Check the message definition `/scan` topic type  
-   7. Check what is the LIDAR topic (`/scan`) frequency
+   `/cmd_vel` is of type `geometry_msgs/msg/TwistStamped` (not plain `Twist`, mind the header).
+   Publish a forward velocity of 0.1 m/s:
 
-3. Command a desired velocity to the turtlebot using terminal
+   ```bash
+   ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/TwistStamped "{twist: {linear: {x: 0.1}}}"
+   ```
 
-    _Lecture slides (pages xx-xx)_
+   Stop it with `Ctrl+C`, then make the robot spin in place. Watch `/odom` while it moves.
 
-4. Use the `​teleop_twist_keyboard` ​to control your robot using the keyboard. Find it online and compile it from source! Use `​git clone​` to clone the repository to the `src`.
+4. **Drive with the keyboard.** Run the `teleop` task, or:
 
-    _Lecture slides (pages xx-xx)_
+   ```bash
+   ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true
+   ```
 
-    For a short git overview refer to [git cheat sheet](http://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf)
+   Why is the `stamped` parameter needed? (Look at the error you get without it.)
+
+5. **Record and replay.** Record 10 seconds of `/scan` and `/odom` into a bag while driving around, then stop the
+   simulation and play the bag back. Verify with `ros2 topic hz /scan` that the data is "live" again.
+
+   ```bash
+   ros2 bag record -o /tmp/module1 /scan /odom
+   ros2 bag info /tmp/module1
+   ros2 bag play /tmp/module1
+   ```
+
+### Stretch
+
+- Use `ros2 topic echo /scan --field ranges` and find the index of the smallest value. Which direction is that?
+  (Hint: `angle_min` and `angle_increment`, index 0 is straight ahead.)
+- Check the QoS of `/scan` with `ros2 topic info -v /scan`. Why is a sensor stream *best effort*?

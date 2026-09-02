@@ -1,0 +1,6 @@
+# Node name -> ros__parameters -> values. Loaded by params.launch.py.
+params_demo:
+  ros__parameters:
+    greeting: "Good morning"
+    rate_hz: 2.0
+    names: ["Alice", "Bob"]

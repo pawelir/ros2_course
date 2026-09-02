@@ -1,50 +1,72 @@
-
-# module 1
+# Module 2: First package, publisher and subscriber
 
 ## Theory
 
-- Package structure
-- ROS 2 C++ Client Library (rclcpp)
-- Subscriber and Publisher
-- Parameters
-- Launch file
-- Rviz visualization
+- Package anatomy for Python (`package.xml`, `setup.py`, `setup.cfg`, `resource/`)
+- rclpy: `Node`, `create_subscription`, `create_publisher`, `create_timer`, logging, `spin`
+- Building with `colcon build --symlink-install`, sourcing `install/setup.bash`
+- Message types: `sensor_msgs/LaserScan`, `geometry_msgs/TwistStamped`
+
+Lecture examples: `examples/ros2_examples/ros2_examples/topics/`.
 
 ## Exercise
 
-The exercise goal is to create first ROS 2 package and node. The responsibility of a created node will be to process subscribed laser scan data from turtlebot3 robot. This will serve as a base for further development on later course stages.
+Goal: a node that reads the laser scanner and stops the robot before it hits something. This package grows through the
+rest of the course.
 
-Make sure to check out the ROS 2 package template for reference, you'll find it in [pawelir/ros2_templates](https://github.com/pawelir/ros2_templates) repository. It will help you a lot with the implementation, now and later during the course.
+1. **Create the package `turtlebot_py_controller`.** _Slides: 02-workspace-and-packages_
 
-1. Create the package `turtlebot_laser_controller`. (Lecture 2, Slides x-x)
+   Either from scratch (harder):
 
-   1. OPTIONAL (more difficult) - Create the package from scratch. You can use the command `ros2 pkg create` to create a new package with the dependencies: `rclcpp` `sensor_msgs`.
+   ```bash
+   cd /workspaces/ros2_course/src        # create src/ if it does not exist
+   ros2 pkg create turtlebot_py_controller --build-type ament_python --node-name laser_controller \
+       --dependencies rclpy sensor_msgs geometry_msgs
+   ```
 
-   2. OR (easy): Clone predefined package from github.
+   or from the template (easier):
 
-        ```bash
-        cd /workspaces/vscode_ros2_workspace/src
-        git clone https://github.com/pawelir/turtlebot_laser_controller.git
-        ```
+   ```bash
+   cp -r /workspaces/ros2_course/templates/turtlebot_py_controller /workspaces/ros2_course/src/
+   ```
 
-1. Inspect the `CMakelists.txt` and `package.xml` files. (Lecture 2 Slides x-x)
+   Open `package.xml` and `setup.py`. Where are dependencies declared? Where do executables get their names?
 
-   1. Make sure that dependencies are set in both files
+2. **Build and run the empty node.**
 
-1. Create a subscriber to the `/scan` topic. (Lecture 2 Slides x-x)
+   ```bash
+   cd /workspaces/ros2_course
+   colcon build --symlink-install
+   source install/setup.bash
+   ros2 run turtlebot_py_controller laser_controller
+   ```
 
-1. Add a configuration file with parameters `topic_name` and `queue_size` for the subscriber of the topic
-`/scan`. (Lecture 2 Slides x-x)
+   The template's node only logs a message. With `--symlink-install` you can edit Python and re-run without rebuilding,
+   unless you touch `setup.py` (then rebuild). If `ros2 run` says "No executable found", check the `console_scripts`
+   entry in `setup.py`.
 
-1. Create a callback method for that subscriber which outputs the smallest distance
-measurement from the `ranges` vector in the message of the `/scan` topic. Inspect the message type [here](https://docs.ros2.org/latest/api/sensor_msgs/msg/LaserScan.html).
+3. **Subscribe to `/scan`.** _Slides: 03-rclpy (Init and spin, Logging, Topic subscriber)_
 
-1. Add launch file to the package, that will be responsible for:
-   1. Running `turtlebot_laser_controller` node
-   2. Loading node's parameters from configuration file
+   In the callback, compute the smallest *valid* distance: ignore `inf`/`nan` and anything outside
+   `[range_min, range_max]`. Log it. Run with the simulation and drive around with teleop. Does the value make sense?
 
-1. Pass the argument laser_enabled from your launch file to the
-smb_gazebo.launch file with value true.
+   Logging at 5 Hz is noisy. Use `throttle_duration_sec=1.0` in `get_logger().info(...)`.
 
-1. [OPTIONAL] Check the [ros2_laser_scan_merger](https://github.com/mich1342/ros2_laser_scan_merger) package, find out what it is doing. What topics node subscribes and publishes, what are the node parameters.
-TODO: Add more steps e.g.
+4. **Publish to `/cmd_vel`.**
+
+   Publish a `TwistStamped` in the same callback: `linear.x = 0.15` if the closest obstacle is farther than 0.5 m,
+   otherwise `0.0`. Set `header.stamp` to the node's clock. Stop teleop first, two publishers on `/cmd_vel` fight.
+
+   **Checkpoint:** the robot drives forward and stops in front of the first wall or pillar. `ros2 topic hz /cmd_vel`
+   shows about 5 Hz (why exactly that rate?).
+
+5. **Inspect what you built.** `ros2 node info /laser_controller`, `rqt_graph`. Your node should sit between the bridge
+   and... the bridge.
+
+### Stretch
+
+- Move the "smallest valid range" computation into a plain function outside the class. Module 7 will unit-test it.
+- Only consider the front 60 degrees of the scan. Which indices are those? (Careful: index 0 is straight ahead and the
+  scan wraps around, so the front sector is `ranges[-30:] + ranges[:30]`.)
+
+Solution: `solutions/module_2/`.

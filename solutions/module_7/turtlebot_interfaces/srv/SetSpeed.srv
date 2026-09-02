@@ -1,0 +1,5 @@
+# Change the controller's cruise speed at runtime.
+float32 speed           # [m/s]
+---
+bool success
+string message
