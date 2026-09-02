@@ -1,0 +1,6 @@
+laser_controller:
+  ros__parameters:
+    forward_speed: 0.12
+    stop_distance: 0.4
+    scan_topic: "scan"
+    cmd_vel_topic: "cmd_vel"

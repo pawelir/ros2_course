@@ -1,0 +1,4 @@
+# Marp CLI configuration – https://github.com/marp-team/marp-cli
+themeSet: theme
+html: true          # needed for the two-column <div class="cols"> layout
+allowLocalFiles: true

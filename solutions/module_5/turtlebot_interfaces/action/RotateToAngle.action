@@ -1,0 +1,7 @@
+# Rotate the robot in place by a relative angle (used from module 5 on).
+float32 angle            # [rad] relative rotation, positive = counter-clockwise
+float32 angular_speed    # [rad/s] > 0, capped by the server
+---
+float32 final_yaw        # [rad] absolute yaw from odometry when done
+---
+float32 remaining        # [rad] how much is left
