@@ -26,7 +26,9 @@ Goal: a robot that wanders around the arena on its own, plus tests that prove th
    `rotate_action_server` and `wander`. Add a `record` argument that starts
    `ros2 bag record /scan /odom /cmd_vel /obstacle_info` via `ExecuteProcess`.
 
-   **Checkpoint:** the robot drives, stops before a pillar, turns 90 degrees, drives on. Let it run for a minute.
+   **Checkpoint:** the robot drives, stops before a pillar, turns 90 degrees, drives on. Let it run for a
+   minute. If it wedges itself into a corner it can keep turning forever: once every direction is closer
+   than `stop_distance` a fixed 90 degrees never frees it. See the stretch for a way out.
 
 3. **Bags.** Record a minute of wandering, then:
 
@@ -46,10 +48,15 @@ Goal: a robot that wanders around the arena on its own, plus tests that prove th
 5. **Integration test** in `test/test_controller_launch.py` with `launch_testing`: start `laser_controller`,
    publish a fake `LaserScan`, assert that `/cmd_vel` is `0.1` when clear and `0.0` when blocked.
 
+   Collect a few `/cmd_vel` messages and assert on the *newest* one: commands answering the previous test
+   case are still in flight, so asserting on the first message that arrives makes the test flaky.
+
    **Checkpoint:** `colcon test --packages-select turtlebot_py_controller` reports 0 failures.
 
 ### Stretch
 
+- Escape a corner: back up for half a second before turning, or keep turning until the front sector is
+  actually clear instead of a fixed 90 degrees.
 - Use `/obstacle_point` from module 6 to avoid turning back toward a pillar you just left.
 - Make `wander` a lifecycle node (`rclpy.lifecycle.Node`) so it can be paused with `ros2 lifecycle set`.
 

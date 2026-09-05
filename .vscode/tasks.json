@@ -52,7 +52,7 @@
       "label": "test",
       "detail": "colcon test + results",
       "type": "shell",
-      "command": "source /opt/ros/jazzy/setup.bash && colcon test && colcon test-result --verbose",
+      "command": "source /opt/ros/jazzy/setup.bash && colcon test; colcon test-result --verbose",
       "group": "test",
       "problemMatcher": []
     }

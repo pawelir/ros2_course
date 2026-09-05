@@ -20,4 +20,5 @@ setup(
     maintainer_email='pawel.irzyk6@gmail.com',
     description='Course simulation bringup.',
     license='Apache-2.0',
+    tests_require=['pytest'],
 )

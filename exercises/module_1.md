@@ -42,7 +42,15 @@ Goal: get comfortable with the CLI by poking at the TurtleBot3 simulation. No co
    ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/TwistStamped "{twist: {linear: {x: 0.1}}}"
    ```
 
-   Stop it with `Ctrl+C`, then make the robot spin in place. Watch `/odom` while it moves.
+   Now stop the publisher with `Ctrl+C` and keep watching `/odom`: **the robot keeps driving.** Gazebo's
+   diff-drive plugin holds on to the last command it received, so "nobody is publishing" does not mean
+   "stop". Send an explicit zero to actually stop it:
+
+   ```bash
+   ros2 topic pub --once /cmd_vel geometry_msgs/msg/TwistStamped "{}"
+   ```
+
+   Then make the robot spin in place, and stop it the same way. Watch `/odom` while it moves.
 
 4. **Drive with the keyboard.** Run the `teleop` task, or:
 
@@ -50,7 +58,9 @@ Goal: get comfortable with the CLI by poking at the TurtleBot3 simulation. No co
    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true
    ```
 
-   Why is the `stamped` parameter needed? (Look at the error you get without it.)
+   Now try it *without* `-p stamped:=true`. Nothing fails: the keys respond, the node publishes happily,
+   and the robot ignores it completely. Diagnose it with `ros2 topic list -t` — `/cmd_vel` now carries
+   *two* message types, and the bridge only subscribes to one of them.
 
 5. **Record and replay.** Record 10 seconds of `/scan` and `/odom` into a bag while driving around, then stop the
    simulation and play the bag back. Verify with `ros2 topic hz /scan` that the data is "live" again.
@@ -65,4 +75,6 @@ Goal: get comfortable with the CLI by poking at the TurtleBot3 simulation. No co
 
 - Use `ros2 topic echo /scan --field ranges` and find the index of the smallest value. Which direction is that?
   (Hint: `angle_min` and `angle_increment`, index 0 is straight ahead.)
-- Check the QoS of `/scan` with `ros2 topic info -v /scan`. Why is a sensor stream *best effort*?
+- Check the QoS of `/scan` with `ros2 topic info -v /scan`. It comes out *reliable*, because that is the
+  `ros_gz_bridge` default — on real hardware a lidar driver usually publishes *best effort* instead. What
+  does a publisher give up by choosing best effort, and why is that the right trade for a sensor stream?

@@ -15,6 +15,10 @@ __pycache__/
 *.mcap
 *.db3
 
+# tf2_tools view_frames output (module 6)
+frames_*.gv
+frames_*.pdf
+
 # editors
 *~
 .idea/

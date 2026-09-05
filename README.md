@@ -54,7 +54,7 @@ slides/          lecture slides
 `solutions/` and `templates/` contain `COLCON_IGNORE`, so only `examples/` and `src/` are built. To try a solution:
 
 ```bash
-cp -r solutions/module_4/* src/ && colcon build --symlink-install && source install/setup.bash
+mkdir -p src && cp -r solutions/module_4/* src/ && colcon build --symlink-install && source install/setup.bash
 ```
 
 ## Facts about the simulation worth knowing

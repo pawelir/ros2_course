@@ -20,7 +20,9 @@ Goal: put the closest obstacle on the map (odom frame) and learn why callbacks s
    ```
 
    Which frames exist? Who publishes `odom -> base_footprint` (dynamic) and `base_link -> base_scan` (static)?
-   Look at `ros2 topic echo /tf_static --once`.
+   Look at `ros2 topic echo /tf_static --once` — the static frames come out with a leading slash
+   (`/base_link`), because turtlebot3_gazebo sets `frame_prefix` on `robot_state_publisher`, while `/tf`
+   uses plain `odom` and `base_footprint`. tf2 strips it, so lookups work either way.
 
 2. **Obstacle locator node.** _Slides: 04-tools (TF2), 03-rclpy (Executors)_ New node `obstacle_locator`:
    - subscribes to `/obstacle_info`,
