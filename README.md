@@ -27,6 +27,20 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
+## Licensing
+
+This repository is deliberately split, because the code and the teaching material are not the
+same kind of asset:
+
+| Path                                                        | License                                                                    |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `examples/`, `templates/`, `solutions/`, `.devcontainer/`   | [Apache-2.0](LICENSE) – matches the `<license>` tag in every `package.xml`  |
+| `slides/`                                                    | [CC BY-NC-SA 4.0](slides/LICENSE) – share and adapt, but not commercially   |
+
+In short: take the packages and build on them freely. The slide decks you may read, teach yourself
+from and adapt, but not sell or deliver commercially without asking. For commercial training use,
+get in touch.
+
 ## Course map
 
 | Module | Topic                    | Exercise                                      | Lecture examples     |
