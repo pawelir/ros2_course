@@ -10,6 +10,9 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: slides
@@ -17,6 +20,8 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # required by softprops/action-gh-release to attach assets
     steps:
       - uses: actions/checkout@v4
 

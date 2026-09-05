@@ -1,3 +1,6 @@
 build/
 node_modules/
 __pycache__/
+
+# browser downloaded by `npx @puppeteer/browsers install chrome` for local PDF/PPTX builds
+chrome/

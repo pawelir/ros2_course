@@ -246,9 +246,7 @@ rviz2 -d my_layout.rviz
 - Adjust size and colour of laser points; check the QoS if a topic shows no data
 - Ctrl+S saves the configuration
 
-Sensor data is often published *best effort*. A best-effort display accepts either kind of
-publisher, while a *reliable* one silently shows nothing against a best-effort publisher – so
-pin the display to Best Effort. (Our Gazebo bridge happens to publish `/scan` reliably.)
+Sensor data is often *best effort*. Pin the display to Best Effort – a *reliable* one silently shows nothing against a best-effort publisher.
 
 </div>
 </div>
