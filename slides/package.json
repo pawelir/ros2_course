@@ -6,7 +6,7 @@
     "preview": "marp --server -I .",
     "build:html": "marp -I . --html -o build/html",
     "build:pdf": "marp -I . --pdf --allow-local-files -o build/pdf",
-    "build:pptx": "marp -I . --pptx --allow-local-files -o build/pptx",
+    "build:pptx": "marp -I . --pptx --allow-local-files --parallel 1 --browser-timeout 0 -o build/pptx",
     "build": "npm run build:html && npm run build:pdf && npm run build:pptx"
   },
   "devDependencies": {
