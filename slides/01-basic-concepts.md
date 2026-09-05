@@ -382,6 +382,11 @@ ros2 topic pub /cmd_vel geometry_msgs/msg/Twist \
   "{linear: {x: 0.2}, angular: {z: 0.5}}"
 ```
 
+Our TurtleBot3 takes `TwistStamped` on `/cmd_vel`
+(same fields under `twist:`, plus a header) – see
+module 1. Publishing plain `Twist` there fails
+*silently*.
+
 </div>
 </div>
 

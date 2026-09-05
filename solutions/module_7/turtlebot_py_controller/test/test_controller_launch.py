@@ -40,17 +40,19 @@ class TestLaserController(unittest.TestCase):
         rclpy.shutdown()
 
     def publish_and_collect(self, closest: float) -> float:
-        self.received.clear()
         scan = LaserScan()
         scan.header.frame_id = 'base_scan'
         scan.angle_increment = math.radians(1.0)
         scan.range_min, scan.range_max = 0.12, 3.5
         scan.ranges = [3.0] * 360
         scan.ranges[0] = closest
-        end = self.node.get_clock().now().nanoseconds + int(5e9)
-        while not self.received and self.node.get_clock().now().nanoseconds < end:
+        # Commands answering the *previous* test can still be in flight, so collect a few and use
+        # the newest one: taking the first message that arrives makes this test flaky.
+        self.received.clear()
+        end = self.node.get_clock().now().nanoseconds + int(10e9)
+        while len(self.received) < 5 and self.node.get_clock().now().nanoseconds < end:
             self.scan_pub.publish(scan)
-            rclpy.spin_once(self.node, timeout_sec=0.2)
+            rclpy.spin_once(self.node, timeout_sec=0.1)
         self.assertTrue(self.received, 'no /cmd_vel received')
         return self.received[-1].twist.linear.x
 

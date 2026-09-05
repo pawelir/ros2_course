@@ -59,6 +59,12 @@ class RotateActionServer(Node):
             return GoalResponse.REJECT
         if goal.angular_speed <= 0.0:
             return GoalResponse.REJECT
+        if abs(goal.angle) > math.pi:
+            # `remaining` in execute() is a wrapped error, so it cannot tell "20 deg to go" from
+            # "340 deg the other way": a bigger goal looks overshot on the first iteration and would
+            # succeed without moving. Reject it rather than lie in the result.
+            self.get_logger().warn(f'|angle| must be <= pi, got {goal.angle:.2f} rad, rejecting goal')
+            return GoalResponse.REJECT
         return GoalResponse.ACCEPT
 
     def on_cancel(self, goal_handle) -> CancelResponse:

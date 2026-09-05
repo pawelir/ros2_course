@@ -55,8 +55,10 @@ Goal: no more magic numbers in the code, and one command that starts everything.
    ros2 launch turtlebot_py_controller laser_controller.launch.py stop_distance:=0.8 use_rviz:=false
    ```
 
-5. **RViz.** _Slides: 04-tools (RViz2)_ Start `rviz2`, set Fixed Frame to `odom`, add displays: `TF`, `LaserScan` on `/scan`
-   (set Reliability to *Best Effort* or nothing shows), `RobotModel` from topic `/robot_description`.
+5. **RViz.** _Slides: 04-tools (RViz2)_ Start `rviz2`, set Fixed Frame to `odom`, add displays: `TF`,
+   `LaserScan` on `/scan`, and `RobotModel` from topic `/robot_description`. For that last one set
+   *Durability Policy* to **Transient Local**, or the robot never appears: the description is published
+   once, latched, long before RViz starts listening.
    Save as `rviz/laser.rviz` in your package and point the launch file at it.
 
    **Checkpoint:** one command starts sim, controller and RViz; the laser points hug the walls; changing

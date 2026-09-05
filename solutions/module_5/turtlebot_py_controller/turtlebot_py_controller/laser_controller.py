@@ -76,6 +76,10 @@ class LaserController(Node):
     # ---- services -------------------------------------------------------------------------
     def on_enable_motion(self, request: SetBool.Request, response: SetBool.Response):
         self.enabled = request.data
+        if not self.enabled:
+            # The simulator latches the last command, so "stop publishing" is not "stop moving":
+            # send one explicit zero before going quiet.
+            self.publish_cmd(0.0)
         response.success = True
         response.message = 'motion enabled' if self.enabled else 'motion disabled'
         self.get_logger().info(response.message)
@@ -112,6 +116,13 @@ class LaserController(Node):
         return SetParametersResult(successful=True)
 
     # ---- main loop (driven by incoming scans) ----------------------------------------------
+    def publish_cmd(self, vx: float):
+        cmd = TwistStamped()
+        cmd.header.stamp = self.get_clock().now().to_msg()
+        cmd.header.frame_id = 'base_link'
+        cmd.twist.linear.x = vx
+        self.cmd_pub.publish(cmd)
+
     def on_scan(self, msg: LaserScan):
         distance, angle = closest_obstacle(msg, self.fov)
         blocked = distance < self.stop_distance
@@ -123,15 +134,14 @@ class LaserController(Node):
         info.blocked = blocked
         self.info_pub.publish(info)
 
-        cmd = TwistStamped()
-        cmd.header.stamp = self.get_clock().now().to_msg()
-        cmd.header.frame_id = 'base_link'
-        cmd.twist.linear.x = self.forward_speed if (self.enabled and not blocked) else 0.0
-        self.cmd_pub.publish(cmd)
+        # While motion is disabled another node owns /cmd_vel (module 5's rotate action server),
+        # so stay off the topic entirely instead of publishing competing zeros at 5 Hz.
+        if self.enabled:
+            self.publish_cmd(0.0 if blocked else self.forward_speed)
 
         self.get_logger().info(
             f'closest obstacle: {distance:.2f} m at {math.degrees(angle):.0f} deg -> '
-            f'{"STOP" if blocked else ("go" if self.enabled else "disabled")}',
+            f'{"disabled" if not self.enabled else ("STOP" if blocked else "go")}',
             throttle_duration_sec=1.0)
 
 

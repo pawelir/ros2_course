@@ -58,8 +58,11 @@ Goal: publish a structured "closest obstacle" message and control the node throu
 
    **Checkpoint:** `ros2 topic echo /obstacle_info` while you push the robot toward a pillar with teleop.
 
-3. **Enable/disable service.** Add a `std_srvs/srv/SetBool` server on `enable_motion`. When disabled, always publish
-   zero velocity.
+3. **Enable/disable service.** Add a `std_srvs/srv/SetBool` server on `enable_motion`. When it is switched
+   off, publish one zero velocity — remember module 1, the last command stays latched, so you have to send
+   a stop actively — and then keep off `/cmd_vel` entirely until it is switched back on. Keep publishing
+   `/obstacle_info` either way. Module 5 adds a second node that drives `/cmd_vel`; if this one kept
+   publishing zeros the two would fight over the topic.
 
    ```bash
    ros2 service list -t

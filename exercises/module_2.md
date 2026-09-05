@@ -19,7 +19,7 @@ rest of the course.
    Either from scratch (harder):
 
    ```bash
-   cd /workspaces/ros2_course/src        # create src/ if it does not exist
+   mkdir -p /workspaces/ros2_course/src && cd /workspaces/ros2_course/src
    ros2 pkg create turtlebot_py_controller --build-type ament_python --node-name laser_controller \
        --dependencies rclpy sensor_msgs geometry_msgs
    ```

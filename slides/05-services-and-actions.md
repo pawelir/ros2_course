@@ -613,7 +613,7 @@ string message
 <!-- src: solutions/module_4/turtlebot_interfaces/action/RotateToAngle.action#L1-L7 -->
 ```text
 # Rotate the robot in place by a relative angle (used from module 5 on).
-float32 angle            # [rad] relative rotation, positive = counter-clockwise
+float32 angle            # [rad] relative rotation, positive = counter-clockwise, |angle| <= pi
 float32 angular_speed    # [rad/s] > 0, capped by the server
 ---
 float32 final_yaw        # [rad] absolute yaw from odometry when done

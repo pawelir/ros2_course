@@ -8,9 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-turtlebot3-gazebo \
     ros-jazzy-turtlebot3-msgs \
     ros-jazzy-teleop-twist-keyboard \
-    ros-jazzy-rqt-graph \
-    ros-jazzy-rqt-topic \
-    ros-jazzy-rqt-reconfigure \
+    ros-jazzy-rqt-common-plugins \
     ros-jazzy-tf2-tools \
     ros-jazzy-ros2bag \
     ros-jazzy-rosbag2-storage-mcap \

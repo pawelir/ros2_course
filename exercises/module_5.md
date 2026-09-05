@@ -16,7 +16,7 @@ Goal: rotate the robot by a requested angle using odometry, with live feedback a
 1. **Define the action** in `turtlebot_interfaces/action/RotateToAngle.action`:
 
    ```text
-   float32 angle            # [rad] relative, positive = counter-clockwise
+   float32 angle            # [rad] relative, positive = counter-clockwise, |angle| <= pi
    float32 angular_speed    # [rad/s]
    ---
    float32 final_yaw        # [rad]
@@ -35,11 +35,16 @@ Goal: rotate the robot by a requested angle using odometry, with live feedback a
    ```
 
 3. **Action server.** Create an `ActionServer` on `rotate_to_angle`.
-   - `goal_callback`: reject if no odometry yet or `angular_speed <= 0`.
+   - `goal_callback`: reject if no odometry yet, if `angular_speed <= 0`, or if `|angle| > pi` (see below).
    - `execute_callback`: compute `target_yaw = wrap(yaw + angle)`; loop at 20 Hz publishing `TwistStamped` with
      `angular.z`, publishing feedback `remaining`, until `|remaining| < 0.02`. Then publish zero, `succeed()`, return
      the result.
    - `cancel_callback`: accept; in the loop check `goal_handle.is_cancel_requested`, stop the robot, `canceled()`.
+
+   `remaining` is a *wrapped* error, so it cannot tell "20 degrees to go" apart from "340 degrees the other
+   way round". That is why goals are limited to `|angle| <= pi`: without the check, a goal of 4 rad looks
+   already overshot on the very first iteration and the server reports success without ever moving. Reject
+   it in `goal_callback` instead of lying in the result.
 
    The execute loop blocks for seconds. For odometry to keep arriving during that time, the server needs a
    `ReentrantCallbackGroup` and a `MultiThreadedExecutor` (see `fibonacci_server.py`). Without them, `yaw` never
@@ -63,5 +68,7 @@ Goal: rotate the robot by a requested angle using odometry, with live feedback a
 
 - Slow down near the target (`angular.z` proportional to `remaining`, with a minimum) to reduce overshoot.
 - Reject a new goal while one is executing, or abort the running one (look at `ActionServer(handle_accepted_callback=...)`).
+- Lift the `|angle| <= pi` limit: accumulate the yaw actually travelled each iteration instead of comparing
+  against a wrapped target, so `angle: 6.28` really turns a full circle.
 
 Solution: `solutions/module_5/`.
