@@ -1,0 +1,9 @@
+ROS 2 Course (Jazzy, Python)
+Copyright 2026 Paweł Irzyk
+
+Code in examples/, templates/, solutions/ and .devcontainer/ is licensed under the
+Apache License, Version 2.0 (see LICENSE).
+
+The lecture slides in slides/ are NOT covered by that license. They are licensed under
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+(see slides/LICENSE).
