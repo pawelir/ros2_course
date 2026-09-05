@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify that slide code blocks are verbatim copies of files in this repository.
 
-Convention (see README.md): a fenced code block that is preceded by
+Convention (see slides/README.md): a fenced code block that is preceded by
 
     <!-- src: examples/ros2_examples/ros2_examples/topics/minimal_publisher.py#L12-L26 -->
 

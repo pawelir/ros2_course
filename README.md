@@ -82,17 +82,8 @@ mkdir -p src && cp -r solutions/module_4/* src/ && colcon build --symlink-instal
 ## Slides
 
 Lecture slides are plain Markdown rendered with [Marp](https://marp.app), one file per lecture module
-in `slides/`; one `---` per slide. Everything runs from `slides/`:
-
-```bash
-cd slides
-npm ci                           # once
-npm run preview                  # live-reload server at http://localhost:8080
-npm run build                    # HTML + PDF + PPTX into slides/build/
-python3 check_snippets.py        # verify code blocks against the packages; --fix rewrites line ranges
-```
-
-In VS Code install the *Marp for VS Code* extension for an inline preview.
+in `slides/`. Each push builds HTML, PDF and PPTX in CI; a GitHub release attaches the merged
+`ros2-course-jazzy.pdf` and per-module PPTX files.
 
 | #   | File                                  | Content                                                                 |
 | --- | ------------------------------------- | ----------------------------------------------------------------------- |
@@ -103,18 +94,4 @@ In VS Code install the *Marp for VS Code* extension for an inline preview.
 | 04  | `slides/04-tools.md`                  | Gazebo Harmonic, RViz2, TF2, rqt, rosbag, URDF                          |
 | 05  | `slides/05-services-and-actions.md`   | Services, actions, custom interfaces, communication strategies, testing |
 
-Conventions:
-
-- Code is always a fenced block, never a screenshot. Use `bash` for commands the student types,
-  `console` for command + output, `python` / `yaml` / `xml` for source.
-- Source snippets are copied **verbatim** from the packages in this repo. Every code slide carries an
-  HTML comment naming the file and line range, e.g.
-  `<!-- src: examples/ros2_examples/ros2_examples/topics/minimal_publisher.py#L13-L27 -->`.
-  Methods lifted from inside a class are dedented by a uniform amount; nothing else changes.
-  `slides/check_snippets.py` verifies every block (CI runs it on every push).
-- Two columns: wrap in `<div class="cols">` with two child `<div>`s
-  (`cols wide-left` / `cols wide-right` for 3:2 splits).
-- Section dividers: `<!-- _class: divider -->`. Title slide: `<!-- _class: title -->`.
-- Per-delivery values (`{{ CITY }}`, `{{ DATE }}`) live on the title slide only.
-- Speaker notes go in an HTML comment at the end of the slide.
-- A GitHub release builds a merged `ros2-course-jazzy.pdf` plus per-module PPTX and attaches them.
+Building, previewing and authoring conventions: [`slides/README.md`](slides/README.md).
